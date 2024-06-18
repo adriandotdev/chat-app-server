@@ -110,6 +110,84 @@ module.exports = (app) => {
 		}
 	);
 
+	app.post(
+		"/api/v1/accounts/signin",
+		[
+			tokenMiddleware.BasicTokenVerifier(),
+			body("username")
+				.notEmpty()
+				.withMessage("Missing required property: username"),
+			body("password")
+				.notEmpty()
+				.withMessage("Missing required property: password"),
+		],
+
+		/**
+		 * @param {import('express').Request} req
+		 * @param {import('express').Response} res
+		 * @param {import('express').NextFunction} next
+		 */
+		async (req, res, next) => {
+			try {
+				logger.info({
+					SIGNIN_ACCOUNT_REQUEST: {
+						data: { ...req.body },
+						message: "SUCCESS",
+					},
+				});
+
+				validate(req, res);
+
+				const result = await service.SignIn({ ...req.body });
+
+				logger.info({
+					SIGNIN_ACCOUNT_RESPONSE: {
+						message: "SUCCESS",
+					},
+				});
+
+				res.cookie("access_token", result.access_token, {
+					maxAge: 900000,
+					httpOnly: true,
+				});
+
+				res.cookie("refresh_token", result.refresh_token, {
+					maxAge: 900000,
+					httpOnly: true,
+				});
+
+				return res
+					.status(200)
+					.json({ status: 200, data: result, message: "Success" });
+			} catch (err) {
+				err.error_name = "SIGNIN_ACCOUNT_ERROR";
+				next(err);
+			}
+		}
+	);
+
+	app.get(
+		"/api/v1/accounts",
+
+		/**
+		 * @param {import('express').Request} req
+		 * @param {import('express').Response} res
+		 * @param {import('express').NextFunction} next
+		 */
+		async (req, res, next) => {
+			try {
+				console.log(req.cookies);
+
+				return res
+					.status(200)
+					.json({ status: 200, data: [], message: "Success" });
+			} catch (err) {
+				req.error_name = "";
+				next(err);
+			}
+		}
+	);
+
 	app.use((err, req, res, next) => {
 		logger.error({
 			API_REQUEST_ERROR: {

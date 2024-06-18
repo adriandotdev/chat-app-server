@@ -34,4 +34,38 @@ module.exports = class AccountRepository {
 			);
 		});
 	}
+
+	SignIn(data) {
+		const QUERY = `
+            SELECT id, username, password FROM users WHERE username = ?
+        `;
+
+		return new Promise((resolve, reject) => {
+			mysql.query(QUERY, [data.username], (err, result) => {
+				if (err) {
+					reject(err);
+				}
+				resolve(result);
+			});
+		});
+	}
+
+	InsertUserTokens(data) {
+		const QUERY = `
+            INSERT INTO user_tokens (user_id, access_token, refresh_token) VALUES (?,?,?)
+        `;
+
+		return new Promise((resolve, reject) => {
+			mysql.query(
+				QUERY,
+				[data.user_id, data.access_token, data.refresh_token],
+				(err, result) => {
+					if (err) {
+						reject(err);
+					}
+					resolve(result);
+				}
+			);
+		});
+	}
 };
