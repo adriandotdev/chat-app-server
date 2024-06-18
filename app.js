@@ -77,7 +77,7 @@ const allowedFileTypes = (req, file, cb) => {
 const upload = multer({
 	storage: storage,
 	fileFilter: allowedFileTypes,
-	limits: { files: 5 },
+	limits: { files: 1 },
 });
 
 /**

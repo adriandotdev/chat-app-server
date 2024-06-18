@@ -4,12 +4,14 @@ const TokenMiddleware = require("../middlewares/TokenMiddleware");
 const { validationResult, body } = require("express-validator");
 
 const { HttpUnprocessableEntity } = require("../utils/HttpError");
+
+const AccountService = require("../services/AccountService");
 /**
  * @param {import('express').Express} app
  */
 module.exports = (app) => {
 	const tokenMiddleware = new TokenMiddleware();
-
+	const service = new AccountService();
 	/**
 	 * This function will be used by the express-validator for input validation,
 	 * and to be attached to APIs middleware.
@@ -91,6 +93,8 @@ module.exports = (app) => {
 
 				validate(req, res);
 
+				const result = await service.RegisterAccount({ ...req.body });
+
 				logger.info({
 					REGISTER_ACCOUNT_RESPONSE: {
 						message: "SUCCESS",
@@ -98,7 +102,7 @@ module.exports = (app) => {
 				});
 				return res
 					.status(200)
-					.json({ status: 200, data: [], message: "Success" });
+					.json({ status: 200, data: result, message: "Success" });
 			} catch (err) {
 				err.error_name = "REGISTER_ACCOUNT_ERROR";
 				next(err);
