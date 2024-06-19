@@ -68,4 +68,65 @@ module.exports = class AccountRepository {
 			);
 		});
 	}
+
+	FindRefreshToken(refreshToken) {
+		const QUERY = `
+            SELECT refresh_token FROM user_tokens WHERE refresh_token = ?
+        `;
+
+		return new Promise((resolve, reject) => {
+			mysql.query(QUERY, [refreshToken], (err, result) => {
+				if (err) {
+					reject(err);
+				}
+				resolve(result);
+			});
+		});
+	}
+
+	DeleteUserTokensWithID(user_id) {
+		const QUERY = `
+            DELETE FROM user_tokens WHERE user_id =?
+        `;
+
+		return new Promise((resolve, reject) => {
+			mysql.query(QUERY, [user_id], (err, result) => {
+				if (err) {
+					reject(err);
+				}
+				resolve(result);
+			});
+		});
+	}
+
+	RefreshToken(data) {
+		const QUERY = `
+            UPDATE 
+                user_tokens 
+            SET 
+                access_token = ?, 
+                refresh_token = ?, 
+                date_modified = NOW()
+            WHERE 
+                user_id = ? AND refresh_token = ?
+        `;
+
+		return new Promise((resolve, reject) => {
+			mysql.query(
+				QUERY,
+				[
+					data.new_access_token,
+					data.new_refresh_token,
+					data.user_id,
+					data.refresh_token,
+				],
+				(err, result) => {
+					if (err) {
+						reject(err);
+					}
+					resolve(result);
+				}
+			);
+		});
+	}
 };

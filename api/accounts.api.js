@@ -167,6 +167,41 @@ module.exports = (app) => {
 	);
 
 	app.get(
+		"/api/v1/refresh",
+		[tokenMiddleware.RefreshTokenVerifier()],
+		/**
+		 * @param {import('express').Request} req
+		 * @param {import('express').Response} res
+		 * @param {import('express').NextFunction} next
+		 */
+		async (req, res, next) => {
+			try {
+				logger.info({
+					REFRESH_TOKEN_REQUEST: {
+						data: {
+							id: req.id,
+							username: req.username,
+						},
+						message: "SUCCESS",
+					},
+				});
+
+				const result = await service.RefreshToken({
+					id: req.id,
+					username: req.username,
+					refresh_token: req.refresh_token,
+				});
+
+				return res
+					.status(200)
+					.json({ status: 200, data: result, message: "Success" });
+			} catch (err) {
+				err.error_name = "REFRESH_TOKEN_ERROR";
+				next(err);
+			}
+		}
+	);
+	app.get(
 		"/api/v1/accounts",
 
 		/**
