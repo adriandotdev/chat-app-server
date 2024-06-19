@@ -201,27 +201,6 @@ module.exports = (app) => {
 			}
 		}
 	);
-	app.get(
-		"/api/v1/accounts",
-
-		/**
-		 * @param {import('express').Request} req
-		 * @param {import('express').Response} res
-		 * @param {import('express').NextFunction} next
-		 */
-		async (req, res, next) => {
-			try {
-				console.log(req.cookies);
-
-				return res
-					.status(200)
-					.json({ status: 200, data: [], message: "Success" });
-			} catch (err) {
-				req.error_name = "";
-				next(err);
-			}
-		}
-	);
 
 	app.use((err, req, res, next) => {
 		logger.error({
